@@ -54,12 +54,12 @@ with every correction applied.
 In the Cabinet (the folder icon). Swipe a card to frame it, take a carbon copy or move
 it to the wastebasket.
 
-**I'm on a folding iPhone. Why did the keyboard move?**
-Platen follows how you hold the device. Propped up like a laptop, the paper sits on the
-raised half and the keys on the flat half. Opened flat in landscape, the keys part at
-the hinge. Stood like a book on a desk, the page is on one side and the machine on the
-other; held in both hands, the keys curve around your thumbs. Closed, the outer display
-shows the carrying case and settings.
+**I'm on a folding iPhone. Where's the typewriter?**
+Platen works best propped up like a laptop, with the paper on the raised half and the
+keys on the flat half, or opened flat and held upright. Folded shut, the outer display
+shows the same typewriter as any iPhone, so you can keep typing. Held like a book, or
+flat in landscape, the keys would sit across the fold, so Platen asks you to change pose;
+your documents and settings are still in the toolbar.
 
 ## Privacy
 
