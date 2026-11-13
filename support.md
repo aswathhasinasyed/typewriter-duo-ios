@@ -57,7 +57,8 @@ it to the wastebasket.
 **I'm on a folding iPhone. Where's the typewriter?**
 Platen works best propped up like a laptop, with the paper on the raised half and the
 keys on the flat half, or opened flat and held upright. Folded shut, the outer display
-shows the same typewriter as any iPhone, so you can keep typing. Held like a book, or
+shows the machine's carrying case; tap **Type on this display** to keep typing there on
+the same typewriter as any iPhone. Held like a book, or
 flat in landscape, the keys would sit across the fold, so Platen asks you to change pose;
 your documents and settings are still in the toolbar.
 
