@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A letter for you · Platen Writer</title>
+<meta name="description" content="A letter typed and sealed on Platen Writer, a 1930s typewriter for iPhone.">
+<meta property="og:title" content="A letter for you">
+<meta property="og:description" content="Sealed with Platen Writer · tap to open">
+<meta name="robots" content="noindex">
+<style>
+  :root { --desk: #2A1A10; --paper: #EFE6D0; --ink: #F2EADB; --body: #C9BFAC; --muted: #A89C86; --brass: #C9A46A; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; color: var(--ink);
+         background: radial-gradient(ellipse 80% 60% at 40% 25%, #4A2E1C 0%, var(--desk) 70%, #1A0F08 100%) fixed;
+         font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 420px; margin: 0 auto; padding: 48px 24px 40px; text-align: center; }
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .24em; color: var(--brass); text-transform: uppercase; }
+  .envelope { position: relative; margin: 24px auto 32px; width: 100%; max-width: 320px; aspect-ratio: 313 / 200;
+              background: var(--paper); box-shadow: 0 20px 40px rgba(0,0,0,.6); overflow: hidden; }
+  .flap { position: absolute; inset: 0 0 auto 0; height: 56%; background: #E2D7BC; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+  .lower { position: absolute; inset: auto 0 0 0; height: 44%; background: #E8DEC5; clip-path: polygon(0 100%, 50% 0, 100% 100%); }
+  .seal { position: absolute; left: 50%; top: 56%; width: 19%; aspect-ratio: 1; transform: translate(-50%, -50%);
+          border-radius: 48% 52% 50% 50%; display: flex; align-items: center; justify-content: center;
+          background: radial-gradient(circle at 38% 32%, #A8443C 0%, #6E2824 60%, #3E1513 100%);
+          box-shadow: 0 4px 8px rgba(0,0,0,.35); font: italic 600 22px/1 Georgia, serif; color: #4A1916; }
+  h1 { margin: 0 0 10px; font: 600 28px/1.15 Georgia, "Times New Roman", serif; }
+  p { margin: 0; color: var(--body); }
+  .actions { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+  .btn { display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 26px;
+         text-decoration: none; font-weight: 600; font-size: 16px; }
+  .primary { background: linear-gradient(180deg, #F0D9A6 0%, #C9A46A 50%, #8A6A3E 100%); color: #2A1C10; }
+  .secondary { border: 1px solid rgba(242,234,219,.45); color: var(--ink); }
+  .small { margin-top: 24px; font-size: 13px; color: var(--muted); }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">You have a letter</div>
+  <div class="envelope" aria-hidden="true"><div class="flap"></div><div class="lower"></div><div class="seal" id="initial"></div></div>
+
+  <section id="letter">
+    <h1>A letter, typed and sealed for you</h1>
+    <p>It was typed on Platen Writer, a 1930s typewriter for iPhone, and it opens there, seal and all.</p>
+    <div class="actions">
+      <a class="btn primary" id="open" href="#">Open the letter in Platen</a>
+      <a class="btn secondary" id="store" href="https://apps.apple.com/search?term=Platen%20Writer">Get Platen Writer on the App Store</a>
+    </div>
+    <p class="small">No Platen yet? Install it, then come back to this page and tap “Open the letter”. The letter travels inside this link: this page never reads or uploads it.</p>
+  </section>
+
+  <section id="empty" class="hidden">
+    <h1>This letter link is incomplete</h1>
+    <p>Ask the sender to share it again from Platen Writer.</p>
+  </section>
+</main>
+<script>
+  // The letter is everything after "#". Browsers never send it to the server.
+  var letter = location.hash.slice(1);
+  if (!letter) {
+    document.getElementById('letter').classList.add('hidden');
+    document.getElementById('empty').classList.remove('hidden');
+  } else {
+    document.getElementById('open').href = 'platen://letter#' + letter;
+  }
+</script>
+</body>
+</html>
