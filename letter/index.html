@@ -67,7 +67,7 @@
   }
 
   // The envelope's names and seal, read in the browser. The letter is compressed
-  // with raw DEFLATE; its header is "PL1", the id, then length-prefixed strings.
+  // with raw DEFLATE; its header is "PL1" or "PL2", the id, then length-prefixed strings.
   async function readEnvelope(text) {
     try {
       if (typeof DecompressionStream === 'undefined') return;
@@ -82,7 +82,7 @@
           bytes = new Uint8Array(await new Response(stream).arrayBuffer());
         } catch (e) { bytes = null; }
       }
-      if (!bytes || bytes[0] !== 0x50 || bytes[1] !== 0x4C || bytes[2] !== 0x31) return;
+      if (!bytes || bytes[0] !== 0x50 || bytes[1] !== 0x4C || (bytes[2] !== 0x31 && bytes[2] !== 0x32)) return;
       var at = 3 + 16;
       var decoder = new TextDecoder();
       function str() { var n = bytes[at]; var s = decoder.decode(bytes.subarray(at + 1, at + 1 + n)); at += 1 + n; return s; }
