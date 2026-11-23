@@ -41,13 +41,13 @@
   <div class="envelope" aria-hidden="true"><div class="flap"></div><div class="lower"></div><div class="seal" id="initial"></div></div>
 
   <section id="letter">
-    <h1>A letter, typed and sealed for you</h1>
+    <h1 id="title">A letter, typed and sealed for you</h1>
     <p>It was typed on Platen Writer, a 1930s typewriter for iPhone, and it opens there, seal and all.</p>
     <div class="actions">
       <a class="btn primary" id="open" href="#">Open the letter in Platen</a>
       <a class="btn secondary" id="store" href="https://apps.apple.com/search?term=Platen%20Writer">Get Platen Writer on the App Store</a>
     </div>
-    <p class="small">No Platen yet? Install it, then come back to this page and tap “Open the letter”. The letter travels inside this link: this page never reads or uploads it.</p>
+    <p class="small">No Platen yet? Install it, then come back to this page and tap “Open the letter”. The letter travels inside this link: only the names on the envelope are read, here in your browser, and nothing is uploaded.</p>
   </section>
 
   <section id="empty" class="hidden">
@@ -63,6 +63,43 @@
     document.getElementById('empty').classList.remove('hidden');
   } else {
     document.getElementById('open').href = 'platen://letter#' + letter;
+    readEnvelope(letter);
+  }
+
+  // The envelope's names and seal, read in the browser. The letter is compressed
+  // with raw DEFLATE; its header is "PL1", the id, then length-prefixed strings.
+  async function readEnvelope(text) {
+    try {
+      if (typeof DecompressionStream === 'undefined') return;
+      var b64 = text.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      var packed = Uint8Array.from(atob(b64), function (c) { return c.charCodeAt(0); });
+      var bytes = null;
+      var formats = ['deflate-raw', 'deflate'];
+      for (var f = 0; f < formats.length && !bytes; f++) {
+        try {
+          var stream = new Blob([packed]).stream().pipeThrough(new DecompressionStream(formats[f]));
+          bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+        } catch (e) { bytes = null; }
+      }
+      if (!bytes || bytes[0] !== 0x50 || bytes[1] !== 0x4C || bytes[2] !== 0x31) return;
+      var at = 3 + 16;
+      var decoder = new TextDecoder();
+      function str() { var n = bytes[at]; var s = decoder.decode(bytes.subarray(at + 1, at + 1 + n)); at += 1 + n; return s; }
+      var from = str(), to = str(); str(); var seal = str(), initial = str();
+      if (from) {
+        document.getElementById('title').textContent = to ? 'From ' + from + ', for ' + to : 'A letter from ' + from;
+        document.title = 'A letter from ' + from + ' · Platen Writer';
+      }
+      if (initial) document.getElementById('initial').textContent = initial;
+      var wax = { oxblood: ['#A8443C', '#7A1717', '#3E0E0C'], forest: ['#4E7A5E', '#2E4A38', '#18281E'],
+                  navy: ['#4A5E8E', '#2A3A62', '#161F38'], gold: ['#F0D9A6', '#C9A46A', '#7A5C30'] }[seal];
+      if (wax) {
+        var sealEl = document.getElementById('initial');
+        sealEl.style.background = 'radial-gradient(circle at 38% 32%, ' + wax[0] + ' 0%, ' + wax[1] + ' 60%, ' + wax[2] + ' 100%)';
+        sealEl.style.color = wax[2];
+      }
+    } catch (e) { /* The page still works without the names. */ }
   }
 </script>
 </body>
