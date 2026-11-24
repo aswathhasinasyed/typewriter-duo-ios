@@ -28,6 +28,24 @@
           border-radius: 48% 52% 50% 50%; display: flex; align-items: center; justify-content: center;
           background: radial-gradient(circle at 38% 32%, #A8443C 0%, #6E2824 60%, #3E1513 100%);
           box-shadow: 0 4px 8px rgba(0,0,0,.35); font: italic 600 22px/1 Georgia, serif; color: #4A1916; }
+  .front { position: absolute; inset: 0; background: var(--paper); display: none; }
+  .has-front .front { display: block; }
+  .has-front .flap, .has-front .lower, .has-front .seal { display: none; }
+  .envelope.has-front { overflow: visible; margin-bottom: 52px; transform: rotate(-2deg); }
+  .from { position: absolute; left: 5%; top: 7%; font: 400 11px/1.5 "Courier New", monospace; color: #6B5F4D; text-align: left; }
+  .to { position: absolute; left: 26%; top: 47%; width: 58%; text-align: left; }
+  .to small { display: block; font: 600 9px/1 -apple-system, sans-serif; letter-spacing: .16em; color: #8E836F; margin-bottom: 6px; }
+  .to span { display: block; font: 400 19px/1.2 "Courier New", monospace; color: #1F1A15; border-bottom: 1px solid #B8AD97; padding-bottom: 4px;
+             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stamp { position: absolute; right: 4.5%; top: 6%; width: 17%; aspect-ratio: 5 / 6; background: #FBF7EC; padding: 4px; box-sizing: border-box;
+           box-shadow: 0 2px 5px rgba(0,0,0,.18); outline: 3px dotted #FBF7EC; outline-offset: -1px; }
+  .stamp div { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+               font: 700 15px/1 Georgia, serif; }
+  .stamp em { font: 600 5px/1 -apple-system, sans-serif; letter-spacing: .1em; font-style: normal; }
+  .peek { position: absolute; left: 50%; bottom: -28px; width: 17%; aspect-ratio: 1; transform: translateX(-50%) rotate(2deg);
+          border-radius: 48% 52% 50% 50%; display: flex; align-items: center; justify-content: center;
+          background: radial-gradient(circle at 38% 32%, #A8443C 0%, #6E2824 60%, #3E1513 100%);
+          box-shadow: 0 4px 8px rgba(0,0,0,.4); font: italic 600 22px/1 Georgia, serif; color: #4A1916; }
   h1 { margin: 0 0 10px; font: 600 28px/1.15 Georgia, "Times New Roman", serif; }
   p { margin: 0; color: var(--body); }
   .actions { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
@@ -42,7 +60,15 @@
 <body>
 <main>
   <div class="eyebrow">You have a letter</div>
-  <div class="envelope" aria-hidden="true"><div class="flap"></div><div class="lower"></div><div class="seal" id="initial"></div></div>
+  <div class="envelope" id="envelope" aria-hidden="true">
+    <div class="flap"></div><div class="lower"></div><div class="seal" id="initial"></div>
+    <div class="front">
+      <div class="from">From<br><span id="fromName"></span></div>
+      <div class="stamp"><div id="stampFace"><em id="stampName"></em><span id="stampValue"></span></div></div>
+      <div class="to"><small>TO</small><span id="toName"></span></div>
+      <div class="peek" id="peek"></div>
+    </div>
+  </div>
 
   <section id="letter">
     <h1 id="title">A letter, typed and sealed for you</h1>
@@ -90,7 +116,28 @@
       var at = 3 + 16;
       var decoder = new TextDecoder();
       function str() { var n = bytes[at]; var s = decoder.decode(bytes.subarray(at + 1, at + 1 + n)); at += 1 + n; return s; }
-      var from = str(), to = str(); str(); var seal = str(), initial = str();
+      var from = str(), to = str(), stamp = str(), seal = str(), initial = str();
+      // The address side, as the app shows a sealed letter: from, to and the stamp.
+      var stamps = {
+        bell: ['The Bell', 5, '#6E2824', '#F2D9A6'], machine: ['The Machine', 10, '#A7B6AF', '#1C2823'],
+        ribbonRed: ['Ribbon Red', 15, '#EFE3C8', '#A8322A'], nightMail: ['Night Mail', 20, '#1D2A4A', '#E6C88E'],
+        carriageReturn: ['Carriage Return', 25, '#ADDDC7', '#1C3A30'], inkwell: ['Inkwell', 30, '#161514', '#E6DCC8'],
+        fold: ['The Fold', 40, '#24418E', '#F6F2E6'], airMail: ['Air Mail', 50, '#FBF7EC', '#2C4E8A'] };
+      var st = stamps[stamp];
+      if (from || to) {
+        document.getElementById('fromName').textContent = from;
+        document.getElementById('toName').textContent = to || 'you';
+        if (st) {
+          var face = document.getElementById('stampFace');
+          face.style.background = st[2]; face.style.color = st[3];
+          document.getElementById('stampName').textContent = st[0].toUpperCase();
+          document.getElementById('stampValue').textContent = st[1];
+        } else {
+          document.querySelector('.stamp').style.display = 'none';
+        }
+        document.getElementById('peek').textContent = initial;
+        document.getElementById('envelope').classList.add('has-front');
+      }
       if (from) {
         document.getElementById('title').textContent = to ? 'From ' + from + ', for ' + to : 'A letter from ' + from;
         document.title = 'A letter from ' + from + ' · Platen Writer';
@@ -99,6 +146,9 @@
       var wax = { oxblood: ['#A8443C', '#7A1717', '#3E0E0C'], forest: ['#4E7A5E', '#2E4A38', '#18281E'],
                   navy: ['#4A5E8E', '#2A3A62', '#161F38'], gold: ['#F0D9A6', '#C9A46A', '#7A5C30'] }[seal];
       if (wax) {
+        var peekEl = document.getElementById('peek');
+        peekEl.style.background = 'radial-gradient(circle at 38% 32%, ' + wax[0] + ' 0%, ' + wax[1] + ' 60%, ' + wax[2] + ' 100%)';
+        peekEl.style.color = wax[2];
         var sealEl = document.getElementById('initial');
         sealEl.style.background = 'radial-gradient(circle at 38% 32%, ' + wax[0] + ' 0%, ' + wax[1] + ' 60%, ' + wax[2] + ' 100%)';
         sealEl.style.color = wax[2];
